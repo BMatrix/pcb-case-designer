@@ -69,6 +69,19 @@ lid_offset = 0.3; //Ultimaker 2
 lid_window = false;
 // Size of the window supports. 0 to disable
 lid_window_support_size = 5;
+// Enable image
+lid_image = false;
+// Image path
+lid_image_file = "image.svg";
+// Depth of the image inset
+lid_image_depth = 0.5;
+// Scale of the image
+lid_image_scale = 1;
+// Rotation of the image
+lid_image_rotation = 0; //[0:0.1:360]
+// Positional offset of the image
+lid_image_offset = [0,0];
+
 
 /* Modules */
 module true_mirror(m, o){
@@ -89,8 +102,9 @@ module dual_true_mirror(m1, o1, m2, o2){
 }
 
 
-if(CREATE == "body"){
+/* Generate */
 //Case
+if(CREATE == "body"){
 difference(){
     translate([-case_thickness,-case_thickness,-case_thickness]){
         cube([
@@ -122,7 +136,7 @@ difference(){
                     translate([
                         (pcb_length+holder_spacing*2+cable_spaceing[1]+cable_spaceing[3])/2 + cable_opening_offset[0] - (cable_opening_ammount-1)*(cable_opening_diameter/2)-cable_opening_spaceing/2*cable_opening_ammount + i*cable_opening_diameter+i*cable_opening_spaceing,
                         cable_opening_diameter/2 + cable_opening_offset[1],
-                        -render_offset/2
+                        -render_offset/2case_height
                     ]){
                         cylinder(case_thickness + render_offset, d=cable_opening_diameter,$fn=50);
                     }
@@ -191,17 +205,35 @@ translate([
 
 
 
-if(CREATE == "lid"){
 //Lid
+if(CREATE == "lid"){
 difference(){
     union(){
-        //Height
-        translate([-case_thickness,-case_thickness,-lid_height]){
-            cube([
-                pcb_length+cable_spaceing[3]+cable_spaceing[1]+case_thickness*2+holder_spacing*2,
-                pcb_width+cable_spaceing[0]+cable_spaceing[2]+case_thickness*2+holder_spacing*2,
+        difference(){
+            //Height
+            translate([-case_thickness,-case_thickness,-lid_height]){
+                cube([
+                    pcb_length+cable_spaceing[3]+cable_spaceing[1]+case_thickness*2+holder_spacing*2,
+                    pcb_width+cable_spaceing[0]+cable_spaceing[2]+case_thickness*2+holder_spacing*2,
                 lid_height
-            ]);
+                ]);
+            }
+            //Image
+            if(lid_image == true){
+                translate([
+                    (pcb_length+cable_spaceing[3]+cable_spaceing[1]+case_thickness+holder_spacing*2)/2+lid_image_offset[0],
+                    (pcb_width+cable_spaceing[0]+cable_spaceing[2]+case_thickness+holder_spacing*2)/2+lid_image_offset[1],
+                    -case_thickness-0.1
+                ]){
+                    rotate([0,0,lid_image_rotation]){
+                        scale([-lid_image_scale,lid_image_scale,1]){
+                            linear_extrude(lid_image_depth+0.1){
+                                import(lid_image_file,center=true);
+                            }
+                        }
+                    }
+                }
+            }
         }
         //Depth
         translate([lid_offset,lid_offset,0]){
