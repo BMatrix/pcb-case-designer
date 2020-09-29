@@ -6,7 +6,7 @@ Created in OpenScad, it allows you to make customizable cases to directly mount 
 * Custom cable openings, circular or rectangular
 * Resizable PCB supports
 * Custom cable routing space
-* Lid customization: debossed SVG image, viewing window (place to mount a piece of plexiglass)
+* Lid customization: debossed SVG image, vents, viewing window (place to mount a piece of plexiglass)
 
 ## Usage
 Download and install [OpenScad](http://www.openscad.org/downloads.html).</br>

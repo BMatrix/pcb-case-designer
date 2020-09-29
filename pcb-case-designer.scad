@@ -81,7 +81,18 @@ lid_image_scale = 1;
 lid_image_rotation = 0; //[0:0.1:360]
 // Positional offset of the image
 lid_image_offset = [0,0];
-
+// Enable vents
+lid_vent = false;
+// Length and width of the vents
+lid_vent_dimentions = [30,3];
+// Ammount if vent slots
+lid_vent_ammount = 4;
+// Spaceing between the vents
+lid_vent_spacing = 3;
+// Rotation of the vents
+lid_vent_rotation = 0; //[0:0.1:360]
+// Positional offset of the vents
+lid_vent_offset = [0,0];
 
 /* Modules */
 module true_mirror(m, o){
@@ -99,6 +110,16 @@ module dual_true_mirror(m1, o1, m2, o2){
             children();
         };
     };
+}
+
+module rotate_around_point(r, pt){
+    translate(pt){
+        rotate(r){
+            translate(-pt){
+                children();
+            }
+        }
+    }   
 }
 
 
@@ -229,6 +250,22 @@ difference(){
                         scale([-lid_image_scale,lid_image_scale,1]){
                             linear_extrude(lid_image_depth+0.1){
                                 import(lid_image_file,center=true);
+                            }
+                        }
+                    }
+                }
+            }
+            //Vent
+            if(lid_vent == true){
+                translate([
+                    (pcb_length+cable_spaceing[3]+cable_spaceing[1]+case_thickness+holder_spacing*2)/2-((lid_vent_dimentions[1]+lid_vent_spacing)*lid_vent_ammount-lid_vent_spacing)/2+lid_vent_offset[0],
+                    (pcb_width+cable_spaceing[0]+cable_spaceing[2]+case_thickness+holder_spacing*2)/2-(lid_vent_dimentions[0])/2+lid_vent_offset[1],
+                    -case_thickness-0.1
+                ]){
+                    rotate_around_point([0,0,lid_vent_rotation],[((lid_vent_dimentions[1]+lid_vent_spacing)*lid_vent_ammount-lid_vent_spacing)/2,lid_vent_dimentions[0]/2]){
+                        for(i=[0:lid_vent_ammount-1]){
+                            translate([i*(lid_vent_spacing+lid_vent_dimentions[1]),0,0]){
+                                cube([lid_vent_dimentions[1],lid_vent_dimentions[0],case_thickness+0.2]);
                             }
                         }
                     }
